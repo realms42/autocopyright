@@ -36,9 +36,9 @@ def calculate_diff(file_path, content, new_content):
         new_content.splitlines(keepends=True),
         fromfile=file_path,
         tofile=file_path + " (new)",
-        lineterm=''
+        lineterm=""
     )
-    diff_output = ''.join(diff)
+    diff_output = "".join(diff)
     if diff_output:
         print(f"Diff for {file_path}:\n{diff_output}")
 
@@ -55,25 +55,25 @@ def copyright_header_update(file_path, copyright_regex, replacement_year, dry_ru
                 if dry_run:
                     calculate_diff(file_path, content, new_content)
                 else:
-                    with open(file_path, 'w', encoding='utf-8') as writable_file:
+                    with open(file_path, 'w', encoding="utf-8") as writable_file:
                         writable_file.write(new_content)
                         print(f"Updated copyright in: {file_path}")
     except IOError as e:
         print(f"Error processing file {file_path}: {e}")
 
-def main(repo_path, copyright_regex, replacement_year, include_pattern, exclude_pattern, dry_run):
-    changed_files = get_changed_files(repo_path, include_pattern, exclude_pattern)
-    for file_path in changed_files:
-        full_path = os.path.join(repo_path, file_path)
-        copyright_header_update(full_path, copyright_regex, replacement_year, dry_run=dry_run)
-
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description="Update copyright headers in your project files.")
     parser.add_argument("path", nargs='?', default=os.getcwd(), help="The path to work with. Defaults to current working directory.")
-    parser.add_argument("--dry-run", action='store_true', help="Run the script in dry-run mode without applying changes.")
-    parser.add_argument("--regex", default=r'(Copyright \(c\) )(\d{4})(.*)', help="Regular expression to match the copyright header. Defaults to a common format.")
-    parser.add_argument("--include-pattern", help="Regex pattern to include files by their names.")
-    parser.add_argument("--exclude-pattern", help="Regex pattern to exclude files or directories from processing.")
+    parser.add_argument("--dry-run", action="store_true", help="Run the script in dry-run mode without applying changes.")
+    parser.add_argument("--regex", default=r"(Copyright \(c\) )(\d{4})(.*)", help="Regular expression to match the copyright header. Defaults to a common format.")
+    parser.add_argument("--include", help="Regex pattern to include files by their names.")
+    parser.add_argument("--exclude", help="Regex pattern to exclude files or directories from processing.")
     parser.add_argument("--year", help="The replacement year for the copyright notice. Defaults to the current year.", default=str(datetime.now().year))
     args = parser.parse_args()
-    main(args.path, args.regex, args.year, args.include_pattern, args.exclude_pattern, args.dry_run)
+    changed_files = get_changed_files(args.path, args.include, args.exclude)
+    for file_path in changed_files:
+        full_path = os.path.join(args.path, file_path)
+        copyright_header_update(full_path, args.regex, args.year, dry_run=args.dry_run)
+
+if __name__ == '__main__':
+    main()

@@ -9,6 +9,11 @@ setup(
         # List your project's dependencies here
         # e.g., 'requests >= 2.24.0',
     ],
+    entry_points={
+        'console_scripts': [
+            'autocopyright=autocopyright.main:main',
+        ],
+    },
     # # Optional metadata
     # author='Your Name',
     # author_email='your.email@example.com',
